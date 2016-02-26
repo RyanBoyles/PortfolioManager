@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Login</title>
+</head>
+
+<body>
+	<h1>Portfolio Manager: Login</h1><br></br>
+
+	<form th:action="@{/login}" method="post">
+		Email: <input type="email" th:field="${login.email}"></input><br></br><br></br>
+		Password: <input type="password" th:field="${login.password}"></input><br></br><br></br>
+		<button>Submit</button><br></br><br></br>
+	</form>
+	
+	<span th:text="${errorMessage}"></span><br></br><br></br>
+	
+	<form th:action="@{/login/newuser}" method="get">
+		Don't have a login? <br></br><br></br>
+		<button>Create New User</button>
+	</form>
+	
+	<!-- Redirect to the user's main page if the login is valid -->
+	<div th:if="${login.isValid()}">
+		<form th:action="@{/sessionkey={sessionKey}/userid={userid}(sessionKey=${login.sessionKey}, userid=${login.hashCode()})}" method="get">
+			<button id="loadUserButton" hidden="true"></button>
+		</form>
+		<script>
+			document.getElementById('loadUserButton').click();
+		</script>
+	</div>
+</body>
+</html>

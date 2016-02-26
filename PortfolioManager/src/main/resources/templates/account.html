@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Account View</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span th:text="#{Not (${user.name})?}"></span>	<!-- INCORRECT SYNTAX -->
+		<button>Logout</button>
+	</form>
+	
+	<h1>Portfolio Manager: Account View</h1>
+	
+	<form>
+		<h3>Account Summary:</h3>
+		Label: <span th:text="${account.label}">Unknown</span><br></br>
+		Company: <span th:text="${account.accountID.company}">Unknown</span><br></br>
+		Number: <span th:text="${account.accountID.number}">Unknown</span><br></br>
+	</form><br></br>
+	
+	<h3>Stocks:</h3>
+	<div th:if="${account.stocks.isEmpty()}">
+		There are currently no stocks associated with this account.<br></br><br></br>
+	</div>
+	<div th:each="stock : ${account.stocks}">
+		<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">
+			Exchange: <span th:text="${stock.stockID.exchange}"></span><br></br>
+			Symbol: <span th:text="${stock.stockID.symbol}"></span><br></br>
+			Name: <span th:text="${stock.name}"></span><br></br>
+			<button>Select Stock</button><br></br><br></br>
+		</form>
+	</div>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/newstock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
+		<button>Add New Stock</button>
+	</form>
+</body>
+</html>

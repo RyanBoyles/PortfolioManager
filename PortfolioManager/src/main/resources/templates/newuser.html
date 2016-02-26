@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: New User Creation</title>
+</head>
+
+<body>
+	<h1>Portfolio Manager: New User Creation</h1>
+
+	<form th:action="@{/login/newuser}" method="post">
+		Name: <input type="text" th:field="${newUser.name}"></input><br></br><br></br>
+		Email: <input type="email" th:field="${newUser.email}"></input><br></br><br></br>
+		Password: <input type="password" th:field="${newUser.password}"></input><br></br><br></br>
+		Verify Password: <input type="password" th:field="${newUser.verifiedPassword}"></input><br></br><br></br>
+		<button>Submit</button><br></br><br></br>
+	</form>
+	
+	<span th:text="${newUserCreationStatus}"></span><br></br><br></br>
+	
+	<form th:action="@{/login}" method="get">
+		<button>Return to Login Screen</button>
+	</form>
+</body>
+</html>

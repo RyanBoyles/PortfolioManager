@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Stock View</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span th:text="#{Not (${user.name})?}"></span>	<!-- INCORRECT SYNTAX -->
+		<button>Logout</button>
+	</form>
+	
+	<h1>Portfolio Manager: Stock View</h1>
+	
+	<form>
+		<h3>Stock Summary:</h3>
+		Exchange: <span th:text="${stock.stockID.exchange}">Unknown</span><br></br>
+		Symbol: <span th:text="${stock.stockID.symbol}">Unknown</span><br></br>
+		Name: <span th:text="${stock.name}">Unknown</span><br></br>
+	</form><br></br>
+	
+	<h3>Something for similar stocks here?</h3>
+	
+</body>
+</html>

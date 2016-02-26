@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Add New Stock</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span th:text="#{Not (${user.name})?}"></span>	<!-- INCORRECT SYNTAX -->
+		<button>Logout</button>
+	</form>
+
+	<h1>Portfolio Manager: Add New Stock</h1>
+
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/newstock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="post">
+		Exchange: <input type="text" th:field="${stock.stockID.exchange}"></input><br></br><br></br>
+		Symbol: <input type="text" th:field="${stock.stockID.symbol}"></input><br></br><br></br>
+		<button>Submit</button>
+	</form>
+</body>
+</html>

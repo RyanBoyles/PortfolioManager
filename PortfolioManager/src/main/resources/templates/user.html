@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: User View</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span th:text="#{Not (${user.name})?}"></span>	<!-- INCORRECT SYNTAX -->
+		<button>Logout</button>
+	</form>
+	
+	<h1>Portfolio Manager: User View</h1>
+	
+	<form>
+		<h3>User Summary:</h3>
+		Name: <span th:text="${user.name}">Unknown</span><br></br>
+		Email: <span th:text="${user.userID.email}">Unknown</span><br></br>
+		Password: <span th:text="${user.password}">Unknown</span><br></br>
+	</form><br></br>
+	
+	<h3>Accounts:</h3>
+	<div th:if="${user.accounts.isEmpty()}">
+		There are currently no accounts associated with this user.<br></br><br></br>
+	</div>
+	<div th:each="acnt : ${user.accounts}">
+		<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${acnt.accountID.hashCode()})}" method="get">
+			Label: <span th:text="${acnt.label}"></span><br></br>
+			Company: <span th:text="${acnt.accountID.company}"></span><br></br>
+			Number: <span th:text="${acnt.accountID.number}"></span><br></br>
+			<button>Select Account</button><br></br><br></br>
+		</form>
+	</div>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/newaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="get">
+		<button>Add New Account</button>
+	</form>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Add New Account</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span th:text="#{Not (${user.name})?}"></span>	<!-- INCORRECT SYNTAX -->
+		<button>Logout</button>
+	</form>
+
+	<h1>Portfolio Manager: Add New Account</h1>
+
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/newaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="post">
+		Label: <input type="text" th:field="${account.label}"></input><br></br><br></br>
+		Company: <input type="text" th:field="${account.accountID.company}"></input><br></br><br></br>
+		Number: <input type="text" th:field="${account.accountID.number}"></input><br></br><br></br>
+		<button>Submit</button>
+	</form>
+</body>
+</html>
