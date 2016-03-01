@@ -6,7 +6,9 @@
 
 <body>
 	<form action="/logout" method="get">
-		<span th:text="#{Not (${user.name})?}"></span>	<!-- INCORRECT SYNTAX -->
+		<span>Not </span>
+		<span th:text="${user.name}">Username</span>
+		<span>?</span>
 		<button>Logout</button>
 	</form>
 
