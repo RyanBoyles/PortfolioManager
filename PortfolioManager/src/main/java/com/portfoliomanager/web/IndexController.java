@@ -237,7 +237,6 @@ public class IndexController
 		newStock.getAccounts().add(account);
 		account.getStocks().add(newStock);
 		
-		// TODO: GET STOCK FROM AN ALREADY POPULATED REPO INSTEAD?
 		stockRepo.save(newStock);
 
 		return "account";

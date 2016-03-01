@@ -16,7 +16,10 @@
 		<h3>Stock Summary:</h3>
 		Exchange: <span th:text="${stock.stockID.exchange}">Unknown</span><br></br>
 		Symbol: <span th:text="${stock.stockID.symbol}">Unknown</span><br></br>
-		Name: <span th:text="${stock.name}">Unknown</span><br></br>
+		Name: <span th:text="${stock.name}">Not Yet Populated</span><br></br>
+		Last Price: <span th:text="${stock.lastPrice}">Not Yet Populated</span><br></br>
+		Price Change: <span th:text="${stock.priceChange}">Not Yet Populated</span><br></br>
+		Percent Change: <span th:text="${stock.percentChange}">Not Yet Populated</span><br></br>
 	</form><br></br>
 	
 	<h3>Something for similar stocks here?</h3>

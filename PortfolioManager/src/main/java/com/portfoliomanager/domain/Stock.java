@@ -1,6 +1,7 @@
 
 package com.portfoliomanager.domain;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,9 +17,9 @@ public class Stock
 	// Attributes
 	private StockID stockID; // Holds key attributes: exchange & symbol
 	private String name;
-	// private double lastPrice;
-	// private double change; // HIBERNATE SQL SYNTAX ERROR WITH DOUBLE TYPE?
-	// private double percentChange;
+	private BigDecimal lastPrice;
+	private BigDecimal priceChange;
+	private BigDecimal percentChange;
 
 	// Relationships
 	private Set<Account> accounts = new HashSet<Account>();
@@ -44,22 +45,36 @@ public class Stock
 		this.name = name;
 	}
 
-	/*
-	 * public double getLastPrice() { return lastPrice; }
-	 * 
-	 * public void setLastPrice(double lastPrice) { this.lastPrice = lastPrice;
-	 * }
-	 * 
-	 * public double getChange() { return change; }
-	 * 
-	 * public void setChange(double change) { this.change = change; }
-	 * 
-	 * public double getPercentChange() { return percentChange; }
-	 * 
-	 * public void setPercentChange(double percentChange) { this.percentChange =
-	 * percentChange; }
-	 */
-	
+	public BigDecimal getLastPrice()
+	{
+		return lastPrice;
+	}
+
+	public void setLastPrice(BigDecimal lastPrice)
+	{
+		this.lastPrice = lastPrice;
+	}
+
+	public BigDecimal getPriceChange()
+	{
+		return priceChange;
+	}
+
+	public void setPriceChange(BigDecimal priceChange)
+	{
+		this.priceChange = priceChange;
+	}
+
+	public BigDecimal getPercentChange()
+	{
+		return percentChange;
+	}
+
+	public void setPercentChange(BigDecimal percentChange)
+	{
+		this.percentChange = percentChange;
+	}
+
 	@ManyToMany
 	public Set<Account> getAccounts()
 	{
@@ -70,13 +85,13 @@ public class Stock
 	{
 		this.accounts = accounts;
 	}
-	
+
 	public Stock()
 	{
 		stockID = new StockID();
 		name = "";
 	}
-	
+
 	public Stock(Stock other)
 	{
 		stockID = new StockID(other.getStockID());
