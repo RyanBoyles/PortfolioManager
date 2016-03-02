@@ -144,7 +144,52 @@ public class IndexController
 		
 		return "user";
 	}
+
+	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/edituser", method = RequestMethod.GET)
+	public String editUserGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute User user, ModelMap model)
+	{
+		if ((!sessionKey.equals(this.sessionKey)) || (userIDHash != validLogin.hashCode()))
+		{
+			return "invalidsessionkey";
+		}
+		
+		NewUser editedUser = new NewUser(user);
+		model.put("editedUser", editedUser);
+
+		return "edituser";
+	}
 	
+	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/edituser", method = RequestMethod.POST)
+	public String editUserPost(@PathVariable String sessionKey, @PathVariable int userIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute User user, @ModelAttribute NewUser editedUser, ModelMap model)
+	{
+		if ((!sessionKey.equals(this.sessionKey)) || (userIDHash != validLogin.hashCode()))
+		{
+			return "invalidsessionkey";
+		}
+		
+		model.put("editedUser", editedUser);
+		
+		String editUserStatus = "";
+		if (editedUser.getVerifiedPassword().equals(editedUser.getPassword()))
+		{
+			user.setName(editedUser.getName());
+			user.setPassword(editedUser.getPassword());
+			
+			userRepo.save(user);
+			
+			validLogin.setPassword(editedUser.getPassword());
+			
+			editUserStatus = "User information updated successfully.";
+		}
+		else
+		{
+			editUserStatus = "Failed to update user information. Please try again.";
+		}
+		model.put("editUserStatus", editUserStatus);
+
+		return "edituser";
+	}
+
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/newaccount", method = RequestMethod.GET)
 	public String newAccountGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @ModelAttribute("login") Login validLogin, ModelMap model)
 	{
@@ -207,6 +252,40 @@ public class IndexController
 		}
 		
 		return "account";
+	}
+	
+	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/editaccount", method = RequestMethod.GET)
+	public String editAccountGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute User user, @ModelAttribute Account account, ModelMap model)
+	{
+		if ((!sessionKey.equals(this.sessionKey)) || (userIDHash != validLogin.hashCode()))
+		{
+			return "invalidsessionkey";
+		}
+		
+		Account editedAccount = new Account(account);
+		model.put("editedAccount", editedAccount);
+		
+		return "editaccount";
+	}
+	
+	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/editaccount", method = RequestMethod.POST)
+	public String editAccountPost(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute User user, @ModelAttribute Account account, @ModelAttribute Account editedAccount, ModelMap model)
+	{
+		if ((!sessionKey.equals(this.sessionKey)) || (userIDHash != validLogin.hashCode()))
+		{
+			return "invalidsessionkey";
+		}
+		
+		model.put("editedAccount", editedAccount);
+		
+		account.setLabel(editedAccount.getLabel());
+		
+		accountRepo.save(account);
+		
+		String editAccountStatus = "Account information updated successfully.";
+		model.put("editAccountStatus", editAccountStatus);
+		
+		return "editaccount";
 	}
 	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/newstock", method = RequestMethod.GET)

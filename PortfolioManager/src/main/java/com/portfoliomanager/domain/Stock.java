@@ -90,12 +90,18 @@ public class Stock
 	{
 		stockID = new StockID();
 		name = "";
+		lastPrice = new BigDecimal("0");
+		priceChange = new BigDecimal("0");
+		percentChange = new BigDecimal("0");
 	}
 
 	public Stock(Stock other)
 	{
 		stockID = new StockID(other.getStockID());
 		name = other.getName();
+		lastPrice = other.getLastPrice();
+		priceChange = other.getPriceChange();
+		percentChange = other.getPercentChange();
 	}
 
 }

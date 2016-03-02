@@ -19,6 +19,9 @@
 		Label: <span th:text="${account.label}">Unknown</span><br></br>
 		Company: <span th:text="${account.accountID.company}">Unknown</span><br></br>
 		Number: <span th:text="${account.accountID.number}">Unknown</span><br></br>
+	</form>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/editaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
+		<button>Edit Account Information</button>
 	</form><br></br>
 	
 	<h3>Stocks:</h3>

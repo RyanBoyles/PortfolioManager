@@ -6,7 +6,7 @@
 
 <body>
 	<form action="/logout" method="get">
-		<span>Not </span>	<!-- INCORRECT SYNTAX -->
+		<span>Not </span>
 		<span th:text="${user.name}">Username</span>
 		<span>?</span>
 		<button>Logout</button>
@@ -19,6 +19,9 @@
 		Name: <span th:text="${user.name}">Unknown</span><br></br>
 		Email: <span th:text="${user.userID.email}">Unknown</span><br></br>
 		Password: <span th:text="${user.password}">Unknown</span><br></br>
+	</form>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/edituser(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="get">
+		<button>Edit User Information</button>
 	</form><br></br>
 	
 	<h3>Accounts:</h3>

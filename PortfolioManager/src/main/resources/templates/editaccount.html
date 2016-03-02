@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Edit Account Information</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span>Not </span>
+		<span th:text="${user.name}">Username</span>
+		<span>?</span>
+		<button>Logout</button>
+	</form>
+
+	<h1>Portfolio Manager: Edit Account Information</h1>
+
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/editaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="post">
+		Label: <input type="text" th:field="${editedAccount.label}"></input><br></br><br></br>
+		<button>Submit</button>
+	</form><br></br>
+	
+	<span th:text="${editAccountStatus}"></span><br></br><br></br>
+	
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
+		<button>Return to Account Screen</button>
+	</form>
+</body>
+</html>

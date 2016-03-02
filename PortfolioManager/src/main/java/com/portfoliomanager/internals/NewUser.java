@@ -1,6 +1,8 @@
 
 package com.portfoliomanager.internals;
 
+import com.portfoliomanager.domain.User;
+
 public class NewUser
 {
 	private String name;
@@ -54,6 +56,14 @@ public class NewUser
 		email = "";
 		password = "";
 		verifiedPassword = "";
+	}
+	
+	public NewUser(User existingUser)
+	{
+		name = existingUser.getName();
+		email = existingUser.getUserID().getEmail();
+		password = existingUser.getPassword();
+		verifiedPassword = existingUser.getPassword();
 	}
 
 }
