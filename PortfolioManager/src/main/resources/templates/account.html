@@ -23,6 +23,9 @@
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/editaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
 		<button>Edit Account Information</button>
 	</form><br></br>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/deleteaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
+		<button>Delete Account</button>
+	</form><br></br>
 	
 	<h3>Stocks:</h3>
 	<div th:if="${account.stocks.isEmpty()}">
@@ -41,6 +44,10 @@
 	</div>
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/newstock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
 		<button>Add New Stock</button>
+	</form><br></br>
+	
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="get">
+		<button>Return to User Screen</button>
 	</form>
 </body>
 </html>

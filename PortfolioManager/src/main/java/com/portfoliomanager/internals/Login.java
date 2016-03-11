@@ -1,6 +1,7 @@
 
 package com.portfoliomanager.internals;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.portfoliomanager.domain.User;
@@ -69,9 +70,8 @@ public class Login
 	{
 		if (userRepo != null)
 		{
-			User user = userRepo.findOne( new UserID(email) );
-
-			if ((user != null) && (password.equals(user.getPassword())))
+			List<User> user = userRepo.findUserByLogin(this.email, this.password);
+			if (!user.isEmpty())
 			{
 				validity = true;
 				generateSessionKey();

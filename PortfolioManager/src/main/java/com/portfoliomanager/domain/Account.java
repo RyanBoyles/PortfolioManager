@@ -46,7 +46,7 @@ public class Account
 	}
 
 	@ManyToOne
-	public User getUser()
+	public User getUser() // TODO: MAYBE CONVERT THIS TO NATIVE SQL
 	{
 		return user;
 	}
@@ -57,7 +57,7 @@ public class Account
 	}
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="accounts")
-	public Set<Stock> getStocks()
+	public Set<Stock> getStocks() // TODO: MAYBE CONVERT THIS TO NATIVE SQL AND CONVERT THE LIST TO A SET. MUST IMPLEMENT .HASHCODE() AND .EQUALS IN THE STOCK CLASS TO DO THIS. REFERENCE "http://stackoverflow.com/questions/1429860/easiest-way-to-convert-a-list-to-a-set-java".
 	{
 		return stocks;
 	}

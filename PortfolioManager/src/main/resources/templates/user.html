@@ -23,6 +23,9 @@
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/edituser(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="get">
 		<button>Edit User Information</button>
 	</form><br></br>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/deleteuser(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="get">
+		<button>Delete User</button>
+	</form><br></br>
 	
 	<h3>Accounts:</h3>
 	<div th:if="${user.accounts.isEmpty()}">
