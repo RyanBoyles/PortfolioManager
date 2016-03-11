@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Delete User</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span>Not </span>
+		<span th:text="${user.name}">Username</span>
+		<span>?</span>
+		<button>Logout</button>
+	</form>
+	
+	<h1>Portfolio Manager: Delete User</h1>
+	
+	<h2>Are you sure you want to delete this user?</h2>
+	
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/deleteuser(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="post">
+		<button>Yes, Delete User</button>
+	</form><br></br><br></br>
+	
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="post">
+		<button>No, Return to User Screen</button>
+	</form><br></br><br></br>
+</body>
+</html>
