@@ -32,6 +32,6 @@ public interface UserRepository extends JpaRepository<User, UserID>
 	
 	@Modifying
 	@Transactional
-	@Query(value = "DELETE FROM User u WHERE u.email = :email", nativeQuery = true)
+	@Query(value = "DELETE FROM User WHERE email = :email", nativeQuery = true)
 	public void removeUser(@Param("email") String email);
 }

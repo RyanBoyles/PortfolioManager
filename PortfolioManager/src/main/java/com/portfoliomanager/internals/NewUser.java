@@ -62,8 +62,8 @@ public class NewUser
 	{
 		name = existingUser.getName();
 		email = existingUser.getUserID().getEmail();
-		password = existingUser.getPassword();
-		verifiedPassword = existingUser.getPassword();
+		password = "";
+		verifiedPassword = "";
 	}
 
 }

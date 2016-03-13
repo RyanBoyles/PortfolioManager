@@ -22,16 +22,16 @@
 	</form>
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/editaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
 		<button>Edit Account Information</button>
-	</form><br></br>
+	</form>
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/deleteaccount(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
 		<button>Delete Account</button>
-	</form><br></br>
+	</form>
 	
 	<h3>Stocks:</h3>
-	<div th:if="${account.stocks.isEmpty()}">
+	<div th:if="${stockRepo.findAllStocksInAccount(account.accountID.company, account.accountID.number).isEmpty()}">
 		There are currently no stocks associated with this account.<br></br><br></br>
 	</div>
-	<div th:each="stock : ${account.stocks}">
+	<div th:each="stock : ${stockRepo.findAllStocksInAccount(account.accountID.company, account.accountID.number)}">
 		<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">
 			Exchange: <span th:text="${stock.stockID.exchange}">Unknown</span><br></br>
 			Symbol: <span th:text="${stock.stockID.symbol}">Unknown</span><br></br>

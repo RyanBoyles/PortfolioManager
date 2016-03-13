@@ -7,11 +7,11 @@
 <body>
 	<h1>Portfolio Manager: New User Creation</h1>
 
-	<form th:action="@{/login/newuser}" method="post">
-		Name: <input type="text" th:field="${newUser.name}"></input><br></br><br></br>
-		Email: <input type="email" th:field="${newUser.email}"></input><br></br><br></br>
-		Password: <input type="password" th:field="${newUser.password}"></input><br></br><br></br>
-		Verify Password: <input type="password" th:field="${newUser.verifiedPassword}"></input><br></br><br></br>
+	<form th:action="@{/login/newuser}" method="post" th:object="${newUser}">
+		Name: <input type="text" th:field="*{name}"></input><br></br><br></br>
+		Email: <input type="email" th:field="*{email}"></input><br></br><br></br>
+		Password: <input type="password" th:field="*{password}"></input><br></br><br></br>
+		Verify Password: <input type="password" th:field="*{verifiedPassword}"></input><br></br><br></br>
 		<button>Submit</button><br></br><br></br>
 	</form>
 	

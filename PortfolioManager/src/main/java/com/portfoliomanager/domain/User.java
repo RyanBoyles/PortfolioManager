@@ -55,7 +55,7 @@ public class User
 	}
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-	public Set<Account> getAccounts()  // TODO: MAYBE CONVERT THIS TO NATIVE SQL AND CONVERT THE LIST TO A SET. MUST IMPLEMENT .HASHCODE() AND .EQUALS IN THE ACCOUNT CLASS TO DO THIS. REFERENCE "http://stackoverflow.com/questions/1429860/easiest-way-to-convert-a-list-to-a-set-java".
+	public Set<Account> getAccounts()
 	{
 		return accounts;
 	}

@@ -14,10 +14,10 @@
 	
 	<h1>Portfolio Manager: Edit User Information</h1>
 
-	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/edituser(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="post">
-		Name: <input type="text" th:field="${editedUser.name}"></input><br></br><br></br>
-		New Password: <input type="password" th:field="${editedUser.password}"></input><br></br><br></br>
-		Verify New Password: <input type="password" th:field="${editedUser.verifiedPassword}"></input><br></br><br></br>
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/edituser(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="post" th:object="${editedUser}">
+		Name: <input type="text" th:field="*{name}"></input><br></br><br></br>
+		New Password: <input type="password" th:field="*{password}"></input><br></br><br></br>
+		Verify New Password: <input type="password" th:field="*{verifiedPassword}"></input><br></br><br></br>
 		<button>Submit</button><br></br><br></br>
 	</form>
 	

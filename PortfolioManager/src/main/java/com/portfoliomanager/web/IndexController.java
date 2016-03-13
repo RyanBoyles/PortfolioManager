@@ -22,7 +22,7 @@ import com.portfoliomanager.repository.StockRepository;
 import com.portfoliomanager.repository.UserRepository;
 
 @Controller
-@SessionAttributes({"login", "sessionKey", "user", "account", "stock"})
+@SessionAttributes({"login", "sessionKey", "userRepo", "accountRepo", "stockRepo", "user", "account", "stock"})
 public class IndexController
 {
 	private String sessionKey;
@@ -39,12 +39,20 @@ public class IndexController
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String homeGet(ModelMap model)
 	{
+		model.put("userRepo", userRepo);
+		model.put("accountRepo", accountRepo);
+		model.put("stockRepo", stockRepo);
+		
 		return "home";
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public String homePost(ModelMap model)
 	{
+		model.put("userRepo", userRepo);
+		model.put("accountRepo", accountRepo);
+		model.put("stockRepo", stockRepo);
+		
 		return "home";
 	}
 	
@@ -53,7 +61,7 @@ public class IndexController
 	{
 		sessionKey = "";
 
-		return "home";
+		return "redirect:/";
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -95,11 +103,13 @@ public class IndexController
 	@RequestMapping(value = "/login/newuser", method = RequestMethod.POST)
 	public String newUserPost(@ModelAttribute NewUser newUser, ModelMap model)
 	{
+		model.put("newUser", newUser);
+		
 		String newUserCreationStatus;
 		
-		if (newUser.getPassword().equals(""))
+		if (newUser.getVerifiedPassword().equals(newUser.getPassword()))
 		{
-			if (newUser.getVerifiedPassword().equals(newUser.getPassword()))
+			if (!newUser.getPassword().equals(""))
 			{
 				List<User> duplicateUser = userRepo.findUserByEmail( newUser.getEmail() );
 				if (duplicateUser.isEmpty())
@@ -120,12 +130,12 @@ public class IndexController
 			}
 			else
 			{
-				newUserCreationStatus = "New user creation failed. Passwords do not match. Please try again.";
+				newUserCreationStatus = "New user creation failed. Password cannot be blank. Please try again.";
 			}
 		}
 		else
 		{
-			newUserCreationStatus = "New user creation failed. Password cannot be blank. Please try again.";
+			newUserCreationStatus = "New user creation failed. Passwords do not match. Please try again.";
 		}
 
 		model.put("newUserCreationStatus", newUserCreationStatus);
@@ -147,7 +157,7 @@ public class IndexController
 		User user = userRepo.findUserByEmail( validLogin.getEmail() ).get(0);
 		model.put("user", user);
 		
-		// TODO: ITERATE THROUGH THE ACCOUNTS OWNED BY THIS USER AND THE STOCKS WITHIN THOSE ACCOUNTS AND POPULATE THE STOCK DATA FOR THIS USER. NOTE THE CRAWLER NEEDS TO AVERAGE (OR GET THE MOST RECENT) INFO FROM MULTIPLE SITES TO COUNT AS AN ADVANCED FUNCTION.
+		// TODO: NOT YET REQUIRED: ITERATE THROUGH THE ACCOUNTS OWNED BY THIS USER AND THE STOCKS WITHIN THOSE ACCOUNTS AND POPULATE THE STOCK DATA FOR THIS USER. NOTE THE CRAWLER NEEDS TO AVERAGE (OR GET THE MOST RECENT) INFO FROM MULTIPLE SITES TO COUNT AS AN ADVANCED FUNCTION.
 		
 		
 		return "user";
@@ -161,7 +171,7 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		return "user";
+		return "redirect:/sessionkey=" + sessionKey + "/userid=" + userIDHash;
 	}
 
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/edituser", method = RequestMethod.GET)
@@ -190,7 +200,7 @@ public class IndexController
 		
 		String editUserStatus = "";
 		
-		if (editedUser.getVerifiedPassword().equals(editedUser.getPassword()))		// TODO: NAME STILL CHANGES EVEN IF PASSWORDS DON'T MATCH, BUT THE STATUS MESSAGE SAYS "PASSWORDS DO NOT MATCH". HOW DOES THAT HAPPEN?
+		if (editedUser.getVerifiedPassword().equals(editedUser.getPassword()))
 		{
 			user.setName(editedUser.getName());
 			if (!editedUser.getPassword().equals(""))
@@ -198,9 +208,9 @@ public class IndexController
 				user.setPassword(editedUser.getPassword());
 			}
 			
-			userRepo.updateUser(user.getUserID().getEmail(), editedUser.getName(), editedUser.getPassword());
+			userRepo.updateUser(user.getUserID().getEmail(), user.getName(), user.getPassword());
 			
-			validLogin.setPassword(editedUser.getPassword());
+			validLogin.setPassword(user.getPassword());
 			
 			editUserStatus = "User information updated successfully.";
 		}
@@ -214,13 +224,6 @@ public class IndexController
 		return "edituser";
 	}
 
-	
-	
-	
-	
-	
-	
-	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/deleteuser", method = RequestMethod.GET)
 	public String deleteUserGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute User user, ModelMap model)
 	{
@@ -229,7 +232,7 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
+		// TODO: OPTIONAL: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
 
 		return "deleteuser";
 	}
@@ -242,26 +245,18 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: ACTUALLY DELETE THE USER, INCLUDING ALL OF ITS ACCOUNTS. DOES THE FOLLOWING SQL DO THAT?
-		for (Account account : user.getAccounts())
+		List<Account> accounts = accountRepo.findAccountsByUser(user.getUserID().getEmail());
+		for (Account account : accounts)
 		{
 			accountRepo.removeAllStocksHeldInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber());
 		}
+		stockRepo.removeStocksHeldInNoAccounts();
 		accountRepo.removeAccountsOwnedByUser(user.getUserID().getEmail());
 		userRepo.removeUser(user.getUserID().getEmail());
 
-		return "home";
+		return "redirect:/";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/newaccount", method = RequestMethod.GET)
 	public String newAccountGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @ModelAttribute("login") Login validLogin, ModelMap model)
 	{
@@ -305,7 +300,8 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		for (Account account : user.getAccounts()) // TODO: CONVERT THIS TO NATIVE SQL? MAYBE JUST CONVERT THE GETACCOUNTS FUNCTION TO NATIVE SQL AND CALL IT GOOD?
+		List<Account> accounts = accountRepo.findAccountsByUser(user.getUserID().getEmail());
+		for (Account account : accounts)
 		{
 			if (account.getAccountID().hashCode() == accountIDHash)
 			{
@@ -361,14 +357,7 @@ public class IndexController
 		
 		return "editaccount";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/deleteaccount", method = RequestMethod.GET)
 	public String deleteAccountGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute User user, @ModelAttribute Account account, ModelMap model)
 	{
@@ -377,7 +366,7 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
+		// TODO: OPTIONAL: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
 		
 		return "deleteaccount";
 	}
@@ -390,21 +379,12 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: ACTUALLY DELETE THE ACCOUNT, INCLUDING ALL OF ITS STOCKS (ONLY IF THEY AREN'T REFERENCED BY ANOTHER ACCOUNT) DOES THE FOLLOWING SQL WORK?
 		accountRepo.removeAllStocksHeldInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber());
 		accountRepo.removeAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber());
 		
-		return "user";
+		return "redirect:/sessionkey=" + sessionKey + "/userid=" + userIDHash;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/newstock", method = RequestMethod.GET)
 	public String newStockGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @ModelAttribute("login") Login validLogin, ModelMap model)
 	{
@@ -428,18 +408,20 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: PREVENT DUPLICATE STOCKS. DOES THE FOLLOWING SQL WORK?
-		List<Stock> duplicateStock = stockRepo.findStockInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
-		if (duplicateStock.isEmpty())
+		List<Stock> duplicateStockInAccount = stockRepo.findStockInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
+		if (duplicateStockInAccount.isEmpty())
 		{
 			newStock.getAccounts().add(account);
 			account.getStocks().add(newStock);
 		
-			//stockRepo.save(newStock); // TODO: CONVERT THIS TO NATIVE SQL. DOES THE FOLLOWING SQL WORK?
-			stockRepo.addStock(newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
+			List<Stock> duplicateStockInStockTable = stockRepo.findStock(newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
+			if (duplicateStockInStockTable.isEmpty())
+			{
+				stockRepo.addStock(newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
+			}
 			accountRepo.addStockToAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
 		
-			// TODO: UPDATE THIS STOCKS REAL TIME INFORMATION (FIRST CHECK IF THE STOCK RESIDES IN ANY OTHER ACCOUNTS OWNED BY THE USER. IF IT DOES, JUST TAKE THAT INFORMATION)
+			// TODO: NOT YET REQUIRED: UPDATE THIS STOCKS REAL TIME INFORMATION (FIRST CHECK IF THE STOCK RESIDES IN ANY OTHER ACCOUNTS OWNED BY THE USER. IF IT DOES, JUST TAKE THAT INFORMATION)
 		
 		}
 
@@ -454,7 +436,8 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		for (Stock stock : account.getStocks()) // TODO: CONVERT THIS TO NATIVE SQL? MAYBE JUST CONVERT THE GETSTOCKS FUNCTION TO NATIVE SQL AND CALL IT GOOD?
+		List<Stock> stocks = stockRepo.findAllStocksInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber());
+		for (Stock stock : stocks)
 		{
 			if (stock.getStockID().hashCode() == stockIDHash)
 			{
@@ -500,7 +483,7 @@ public class IndexController
 		Long editedNumberOfShares = accountRepo.findSharesByAccountStock(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol());
 		model.put("editedNumberOfShares", editedNumberOfShares);
 		
-		return "editstock"; // TODO: MAKE AN EDITSTOCK.HTML FILE
+		return "editstock"; // TODO: NOT YET REQUIRED: MAKE AN EDITSTOCK.HTML FILE
 	}
 	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/stockid={stockIDHash}/editstock", method = RequestMethod.POST)
@@ -519,7 +502,7 @@ public class IndexController
 		
 		if (editedNumberOfShares >= 0)
 		{
-			//stockRepo.save(stock); // TODO: CONVERT THIS TO NATIVE SQL. DOES THE FOLLOWING SQL WORK?
+			//stockRepo.save(stock); // TODO: NOT YET REQUIRED: CONVERT THIS TO NATIVE SQL. DOES THE FOLLOWING SQL WORK?
 			accountRepo.updateSharesOfAccountStock(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol(), editedNumberOfShares);
 		
 			editStockStatus = "Stock information updated successfully.";
@@ -531,9 +514,17 @@ public class IndexController
 		
 		model.put("editStockStatus", editStockStatus);
 		
-		return "editstock"; // TODO: MAKE AN EDITSTOCK.HTML FILE
+		return "editstock"; // TODO: NOT YET REQUIRED: MAKE AN EDITSTOCK.HTML FILE
 	}
 		
+	
+	
+	
+	
+	
+	
+	
+	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/stockid={stockIDHash}/deletestock", method = RequestMethod.GET)
 	public String deleteStockGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, ModelMap model)
 	{
@@ -542,30 +533,23 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
+		// TODO: OPTIONAL: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
 		
 		return "deletestock";
 	}
 	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/stockid={stockIDHash}/deletestock", method = RequestMethod.POST)
-	public String stockGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, ModelMap model)
+	public String deleteStockPost(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, ModelMap model)
 	{
 		if ((!sessionKey.equals(this.sessionKey)) || (userIDHash != validLogin.hashCode()))
 		{
 			return "invalidsessionkey";
 		}
 		
-		// ACTUALLY REMOVE THE STOCK FROM THE ACCOUNT AND REMOVE THE STOCK FROM THE STOCK TABLE IF IT IS NO LONGER IN ANY ACCOUNT. DOES THE FOLLOWING SQL WORK?
 		accountRepo.removeStockHeldInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol());
+		stockRepo.removeStocksHeldInNoAccounts();
 		
-		return "account";
+		return "redirect:/sessionkey=" + sessionKey + "/userid=" + userIDHash + "/accountid=" + accountIDHash;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 }

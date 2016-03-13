@@ -23,12 +23,12 @@
 		Price Change: <span th:text="${stock.priceChange}">Not Yet Populated</span><br></br>
 		Percent Change: <span th:text="${stock.percentChange}">Not Yet Populated</span><br></br>
 	</form><br></br>
-	<form th:action="" method="get">
+	<form action="" method="get">
 		<button>Edit Stock Information</button>
-	</form><br></br>
+	</form>
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}/deletestock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">
 		<button>Delete Stock</button>
-	</form><br></br>
+	</form>
 	
 	<h3>Something for similar stocks here?</h3>
 	

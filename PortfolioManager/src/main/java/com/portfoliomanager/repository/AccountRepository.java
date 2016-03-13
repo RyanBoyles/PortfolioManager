@@ -14,6 +14,9 @@ import com.portfoliomanager.internals.AccountID;
 
 public interface AccountRepository extends JpaRepository<Account, AccountID>
 {
+	@Query(value = "SELECT * FROM Account a WHERE a.user_email = :user_email", nativeQuery = true)
+	public List<Account> findAccountsByUser(@Param("user_email") String user_email);
+	
 	@Query(value = "SELECT * FROM Account a WHERE a.user_email = :user_email AND a.company = :company AND a.number = :number", nativeQuery = true)
 	public List<Account> findAccountByUserCompanyNumber(@Param("user_email") String user_email, @Param("company") String company, @Param("number") Long number);
 	
@@ -29,12 +32,12 @@ public interface AccountRepository extends JpaRepository<Account, AccountID>
 
 	@Modifying
 	@Transactional
-	@Query(value = "DELETE FROM Account a WHERE a.company = :company AND a.number = :number", nativeQuery = true)
+	@Query(value = "DELETE FROM Account WHERE company = :company AND number = :number", nativeQuery = true)
 	public void removeAccount(@Param("company") String company, @Param("number") Long number);
 	
 	@Modifying
 	@Transactional
-	@Query(value = "DELETE FROM Account a WHERE a.user_email = :user_email", nativeQuery = true)
+	@Query(value = "DELETE FROM Account WHERE user_email = :user_email", nativeQuery = true)
 	public void removeAccountsOwnedByUser(@Param("user_email") String userEmail);
 	
 	@Query(value = "SELECT shares FROM Stock_Account sa WHERE sa.accounts_company = :company AND sa.accounts_number = :number AND sa.stocks_exchange = :exchange AND sa.stocks_symbol = :symbol", nativeQuery = true)
@@ -52,11 +55,11 @@ public interface AccountRepository extends JpaRepository<Account, AccountID>
 
 	@Modifying
 	@Transactional
-	@Query(value = "DELETE FROM Stock_Account sa WHERE sa.accounts_company = :company AND sa.accounts_number = :number AND sa.stocks_exchange = :exchange AND sa.stocks_symbol = :symbol", nativeQuery = true)
+	@Query(value = "DELETE FROM Stock_Account WHERE accounts_company = :company AND accounts_number = :number AND stocks_exchange = :exchange AND stocks_symbol = :symbol", nativeQuery = true)
 	public void removeStockHeldInAccount(@Param("company") String company, @Param("number") Long number, @Param("exchange") String exchange, @Param("symbol") String symbol);
 	
 	@Modifying
 	@Transactional
-	@Query(value = "DELETE FROM Stock_Account sa WHERE sa.accounts_company = :company AND sa.accounts_number = :number", nativeQuery = true)
+	@Query(value = "DELETE FROM Stock_Account WHERE accounts_company = :company AND accounts_number = :number", nativeQuery = true)
 	public void removeAllStocksHeldInAccount(@Param("company") String company, @Param("number") Long number);
 }
