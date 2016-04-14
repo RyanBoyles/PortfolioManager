@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<title>Portfolio Manager: Edit Stock Information</title>
+</head>
+
+<body>
+	<form action="/logout" method="get">
+		<span>Not </span>
+		<span th:text="${user.name}">Username</span>
+		<span>?</span>
+		<button>Logout</button>
+	</form>
+
+	<h1>Portfolio Manager: Edit Stock Information</h1>
+
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}/editstock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="post">
+		Number Of Shares: <input type="number" th:field="${editedNumberOfShares.value}"></input><br></br><br></br>
+		<button>Submit</button>
+	</form><br></br>
+	
+	<span th:text="${editStockStatus}"></span><br></br><br></br>
+	
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">
+		<button>Return to Stock Screen</button>
+	</form>
+</body>
+</html>

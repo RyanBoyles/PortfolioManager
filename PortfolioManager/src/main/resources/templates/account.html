@@ -16,6 +16,7 @@
 	
 	<form>
 		<h3>Account Summary:</h3>
+		<!-- Value: <span th:text="${}">Unknown</span><br></br> -->
 		Label: <span th:text="${account.label}">Unknown</span><br></br>
 		Company: <span th:text="${account.accountID.company}">Unknown</span><br></br>
 		Number: <span th:text="${account.accountID.number}">Unknown</span><br></br>
@@ -33,6 +34,7 @@
 	</div>
 	<div th:each="stock : ${stockRepo.findAllStocksInAccount(account.accountID.company, account.accountID.number)}">
 		<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">
+			Number Of Shares: <span th:text="${accountRepo.findSharesByAccountStock(account.accountID.company, account.accountID.number, stock.stockID.exchange, stock.stockID.symbol)}">Unknown</span><br></br>
 			Exchange: <span th:text="${stock.stockID.exchange}">Unknown</span><br></br>
 			Symbol: <span th:text="${stock.stockID.symbol}">Unknown</span><br></br>
 			Name: <span th:text="${stock.name}">Not Yet Populated</span><br></br>

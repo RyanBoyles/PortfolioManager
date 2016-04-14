@@ -17,6 +17,7 @@ import com.portfoliomanager.domain.Stock;
 import com.portfoliomanager.domain.User;
 import com.portfoliomanager.internals.Login;
 import com.portfoliomanager.internals.NewUser;
+import com.portfoliomanager.internals.NumberOfShares;
 import com.portfoliomanager.repository.AccountRepository;
 import com.portfoliomanager.repository.StockRepository;
 import com.portfoliomanager.repository.UserRepository;
@@ -231,8 +232,6 @@ public class IndexController
 		{
 			return "invalidsessionkey";
 		}
-		
-		// TODO: OPTIONAL: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
 
 		return "deleteuser";
 	}
@@ -366,8 +365,6 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		// TODO: OPTIONAL: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
-		
 		return "deleteaccount";
 	}
 	
@@ -460,15 +457,6 @@ public class IndexController
 		return "stock";
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/stockid={stockIDHash}/editstock", method = RequestMethod.GET)
 	public String editStockGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, ModelMap model)
 	{
@@ -477,33 +465,30 @@ public class IndexController
 			return "invalidsessionkey";
 		}
 		
-		//Stock editedStock = new Stock(stock);
-		//model.put("editedStock", editedStock);
+		NumberOfShares editedNumberOfShares = new NumberOfShares();
+		Long numberOfShares = accountRepo.findSharesByAccountStock(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol());
+		editedNumberOfShares.setValue(numberOfShares);
 		
-		Long editedNumberOfShares = accountRepo.findSharesByAccountStock(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol());
 		model.put("editedNumberOfShares", editedNumberOfShares);
 		
-		return "editstock"; // TODO: NOT YET REQUIRED: MAKE AN EDITSTOCK.HTML FILE
+		return "editstock";
 	}
 	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/stockid={stockIDHash}/editstock", method = RequestMethod.POST)
-	public String editStockPost(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, @ModelAttribute Long editedNumberOfShares, ModelMap model)
+	public String editStockPost(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, @ModelAttribute NumberOfShares editedNumberOfShares, ModelMap model)
 	{
 		if ((!sessionKey.equals(this.sessionKey)) || (userIDHash != validLogin.hashCode()))
 		{
 			return "invalidsessionkey";
 		}
 		
-		//model.put("editedStock", editedStock);
-		
 		model.put("editedNumberOfShares", editedNumberOfShares);
 		
 		String editStockStatus;
 		
-		if (editedNumberOfShares >= 0)
+		if (editedNumberOfShares.getValue() >= 0)
 		{
-			//stockRepo.save(stock); // TODO: NOT YET REQUIRED: CONVERT THIS TO NATIVE SQL. DOES THE FOLLOWING SQL WORK?
-			accountRepo.updateSharesOfAccountStock(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol(), editedNumberOfShares);
+			accountRepo.updateSharesOfAccountStock(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol(), editedNumberOfShares.getValue());
 		
 			editStockStatus = "Stock information updated successfully.";
 		}
@@ -514,17 +499,9 @@ public class IndexController
 		
 		model.put("editStockStatus", editStockStatus);
 		
-		return "editstock"; // TODO: NOT YET REQUIRED: MAKE AN EDITSTOCK.HTML FILE
+		return "editstock";
 	}
 		
-	
-	
-	
-	
-	
-	
-	
-	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}/accountid={accountIDHash}/stockid={stockIDHash}/deletestock", method = RequestMethod.GET)
 	public String deleteStockGet(@PathVariable String sessionKey, @PathVariable int userIDHash, @PathVariable int accountIDHash, @PathVariable int stockIDHash, @ModelAttribute("login") Login validLogin, @ModelAttribute Account account, @ModelAttribute Stock stock, ModelMap model)
 	{
@@ -532,8 +509,6 @@ public class IndexController
 		{
 			return "invalidsessionkey";
 		}
-		
-		// TODO: OPTIONAL: ADD A NEW LOGIN OBJECT TO THE MODEL AND MAKE THEM TYPE THEIR PASSWORD AND CHECK IF IT MATCHES THE VALID LOGIN INFO?
 		
 		return "deletestock";
 	}

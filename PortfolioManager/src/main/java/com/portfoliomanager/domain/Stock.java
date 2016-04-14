@@ -20,6 +20,21 @@ public class Stock
 	private BigDecimal lastPrice;
 	private BigDecimal priceChange;
 	private BigDecimal percentChange;
+	
+	/*
+	// New attributes
+	private BigDecimal beta;
+	private String sector;
+	
+	// Possible new attributes?
+	private BigDecimal todaysOpen;
+	private BigDecimal todaysHigh;
+	private BigDecimal todaysLow;
+	private BigDecimal fiftyTwoWeekHigh;
+	private BigDecimal fiftyTwoWeekLow;
+	private BigDecimal priceToEarningRatio;
+	private BigDecimal yield;
+	*/
 
 	// Relationships
 	private Set<Account> accounts = new HashSet<Account>();

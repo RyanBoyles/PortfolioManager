@@ -16,6 +16,7 @@
 	
 	<form>
 		<h3>Stock Summary:</h3>
+		Number Of Shares: <span th:text="${accountRepo.findSharesByAccountStock(account.accountID.company, account.accountID.number, stock.stockID.exchange, stock.stockID.symbol)}">Unknown</span><br></br>
 		Exchange: <span th:text="${stock.stockID.exchange}">Unknown</span><br></br>
 		Symbol: <span th:text="${stock.stockID.symbol}">Unknown</span><br></br>
 		Name: <span th:text="${stock.name}">Not Yet Populated</span><br></br>
@@ -23,7 +24,7 @@
 		Price Change: <span th:text="${stock.priceChange}">Not Yet Populated</span><br></br>
 		Percent Change: <span th:text="${stock.percentChange}">Not Yet Populated</span><br></br>
 	</form><br></br>
-	<form action="" method="get">
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}/editstock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">
 		<button>Edit Stock Information</button>
 	</form>
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}/stockid={stockid}/deletestock(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()}, stockid=${stock.stockID.hashCode()})}" method="get">

@@ -17,11 +17,17 @@ public interface StockRepository extends JpaRepository<Stock, StockID>
 	@Query(value="SELECT * FROM Stock s WHERE s.exchange = :exchange AND s.symbol = :symbol", nativeQuery = true)
 	public List<Stock> findStock(@Param("exchange") String exchange, @Param("symbol") String symbol);
 	
+	
+	
+	// THE TWO QUERIES BELOW NEED TO BE CHANGED TO SELECT ANY NEW STOCK ATTRIBUTES THAT GET ADDED.
+	
 	@Query(value = "SELECT s.exchange, s.symbol, s.name, s.lastPrice, s.priceChange, s.percentChange FROM Stock s, Stock_Account sa WHERE sa.accounts_company = :company AND sa.accounts_number = :number AND sa.stocks_exchange = :exchange AND sa.stocks_symbol = :symbol AND s.exchange = sa.stocks_exchange AND s.symbol = sa.stocks_symbol", nativeQuery = true)
 	public List<Stock> findStockInAccount(@Param("company") String company, @Param("number") Long number, @Param("exchange") String exchange, @Param("symbol") String symbol);
 	
 	@Query(value = "SELECT s.exchange, s.symbol, s.name, s.lastPrice, s.priceChange, s.percentChange FROM Stock s, Stock_Account sa WHERE sa.accounts_company = :company AND sa.accounts_number = :number AND s.exchange = sa.stocks_exchange AND s.symbol = sa.stocks_symbol", nativeQuery = true)
 	public List<Stock> findAllStocksInAccount(@Param("company") String company, @Param("number") Long number);
+	
+	
 	
 	@Modifying
 	@Transactional
@@ -32,4 +38,6 @@ public interface StockRepository extends JpaRepository<Stock, StockID>
 	@Transactional
 	@Query(value = "DELETE FROM Stock WHERE NOT EXISTS(SELECT * FROM Stock_Account sa WHERE sa.stocks_exchange = exchange AND sa.stocks_symbol = symbol)", nativeQuery = true)
 	public void removeStocksHeldInNoAccounts();
+	
+	
 }
