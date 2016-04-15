@@ -84,6 +84,8 @@ public class Scraper {
 
         String pe = table.substring(table.indexOf("P/E"));
         pe = pe.substring(pe.indexOf("data1")+7, pe.indexOf("</td>"));
+        if(pe.equals("N/A"))
+            pe = "0";
 
         String yield = table.substring(table.indexOf("Yield"));
         yield = yield.substring(yield.indexOf("(")+1, yield.indexOf(")"));
@@ -130,7 +132,9 @@ public class Scraper {
 
         String pe = section.substring(section.indexOf("P/E"));
         pe = pe.substring(pe.indexOf("val")+5);
-        pe = pe.substring(0,pe.indexOf("</td>"));
+        pe = pe.substring(0,pe.indexOf("</td>")).trim();
+        if(pe.indexOf("-") != -1)
+            pe = "0";
 
         String yield = section.substring(section.indexOf("Div/yield"));
         yield = yield.substring(yield.indexOf("val")+5);
@@ -190,7 +194,10 @@ public class Scraper {
         String pe = section.substring(section.indexOf("P/E"));
         pe = pe.substring(pe.indexOf("truncated-string"));
         pe = pe.substring(pe.indexOf(">")+1);
-        pe = pe.substring(0, pe.indexOf(" ("));
+        if(pe.indexOf("-") != -1)
+            pe = "0";
+        else
+            pe = pe.substring(0, pe.indexOf(" ("));
 
         return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
                 ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
@@ -241,7 +248,10 @@ public class Scraper {
 
         String pe = section.substring(section.indexOf("P/E ratio"));
         pe = pe.substring(pe.indexOf("Point\">")+7);
-        pe = pe.substring(0,pe.indexOf("</td>"));
+        if(pe.indexOf("NM") != -1)
+            pe = "0";
+        else
+            pe = pe.substring(0,pe.indexOf("</td>"));
 
         String weekLow = webpage.substring(webpage.indexOf("val lo"));
         weekLow = weekLow.substring(weekLow.indexOf(">")+1, weekLow.indexOf("</div>"));
@@ -284,6 +294,6 @@ public class Scraper {
         return avg;
     }
     public static void main(String[] args){
-        scrapeCNN("GOOGL");
+        scrapeAll("TSLA","NYS");
     }
 }
