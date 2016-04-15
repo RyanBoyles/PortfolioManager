@@ -249,9 +249,16 @@ public class Scraper {
         String weekHigh = webpage.substring(webpage.indexOf("val hi"));
         weekHigh = weekHigh.substring(weekHigh.indexOf(">")+1, weekHigh.indexOf("</div>"));
 
-        return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
+        StockInfo cnn =  new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
                 ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
                 ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+
+        search = "companyName";
+        String name = webpage.substring(webpage.indexOf(search)+search.length()+2);
+        name = name.substring(name.indexOf(">")+1,name.indexOf("<span")).trim();
+        cnn.name = name;
+
+        return cnn;
     }
 
     public static StockInfo scrapeAll(String stock, String exchange){
@@ -270,12 +277,13 @@ public class Scraper {
         avg.todayLow = (google.todayLow + msn.todayLow + cnn.todayLow + yahoo.todayLow) / 4;
         avg.weekHigh = (google.weekHigh + msn.weekHigh + cnn.weekHigh + yahoo.weekHigh) / 4;
         avg.weekLow = (google.weekLow + msn.weekLow + cnn.weekLow + yahoo.weekLow) / 4;
-        avg.pe = (google.pe + msn.pe + cnn.pe + yahoo.pe ) / 4;
+        avg.pe = (google.pe + msn.pe + cnn.pe + yahoo.pe) / 4;
         avg.yield = (google.yield + msn.yield + cnn.yield + yahoo.yield) / 4;
+        avg.name = cnn.name;
 
         return avg;
     }
     public static void main(String[] args){
-        scrapeAll("GOOGL","NAS");
+        scrapeCNN("GOOGL");
     }
 }

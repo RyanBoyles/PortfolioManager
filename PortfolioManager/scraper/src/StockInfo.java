@@ -2,6 +2,7 @@
  * Created by jeffl_000 on 4/10/2016.
  */
 public class StockInfo {
+    String name;
     double price;
     double priceChange;
     double perChange;
@@ -16,6 +17,7 @@ public class StockInfo {
 
     public StockInfo(){
         price = perChange = priceChange = open = todayHigh = todayLow = weekLow = weekHigh = pe = yield = 0;
+        name = "";
     }
 
     public StockInfo(double price, double priceChange, double perChange){
@@ -36,5 +38,7 @@ public class StockInfo {
         this.weekLow = weekLow;
         this.pe = pe;
         this.yield = yield;
+        this.name = "";
     }
 }
+
