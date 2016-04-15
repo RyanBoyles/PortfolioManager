@@ -42,6 +42,26 @@ public class Scraper {
         }
         return page;
     }
+
+    public static StockInfo replaceComma(String price, String priceChange, String perChange, String open, String todayHigh,
+                                    String todayLow, String weekHigh, String weekLow, String pe, String yield){
+
+        price = price.replaceAll(",","");
+        priceChange = priceChange.replaceAll(",","");
+        perChange = perChange.replaceAll(",","");
+        open = open.replaceAll(",","");
+        todayHigh = todayHigh.replaceAll(",","");
+        todayLow = todayLow.replaceAll(",","");
+        weekHigh = weekHigh.replaceAll(",","");
+        weekLow = weekLow.replaceAll(",","");
+        pe = pe.replaceAll(",","");
+        yield = yield.replaceAll(",","");
+
+        return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
+                ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
+                ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+    }
+
     public static StockInfo scrapeYahoo(String stock){
         String webpage = scrape(yahoo+stock);  // price search for id: "yfs_184_(symbol)"
         String id = "yfs_l84_" + stock.toLowerCase();
@@ -94,12 +114,14 @@ public class Scraper {
         else
             yield = yield.substring(0,yield.indexOf("%"));
 
-        return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
-                ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
-                ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
     }
-    public static StockInfo scrapeGoogle(String stock){
-        String webpage = scrape(google+stock);
+    public static StockInfo scrapeGoogle(String stock, String exchange){
+        if(exchange.equals("NAS"))
+            exchange = "NASDAQ";
+        else
+            exchange = "NYSE";
+        String webpage = scrape(google+exchange+"+"+stock);
         String search = "class=\"pr\"";
         int index = webpage.indexOf(search) + search.length() + 1;
         String price = webpage.substring(index);
@@ -112,7 +134,7 @@ public class Scraper {
         String priceChange = section.substring(section.indexOf("c\">")+3, section.indexOf("</s"));
         String perChange = section.substring(section.indexOf("(")+1, section.indexOf("%"));
 //        System.out.println(price);
-        String range = section.substring(section.indexOf("range"));
+        String range = section.substring(section.indexOf("Range"));
         range = range.substring(range.indexOf("val")+5);
         range = range.substring(0,range.indexOf("</td>"));
         String[] rangeVals = range.split("-");
@@ -144,9 +166,7 @@ public class Scraper {
         else
             yield = yield.substring(yield.indexOf("/")+1);
 
-        return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
-                ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
-                ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
     }
     public static StockInfo scrapeMSN(String stock, String exchange){
         String webpage = scrape(msn+stock+"."+exchange);
@@ -199,9 +219,7 @@ public class Scraper {
         else
             pe = pe.substring(0, pe.indexOf(" ("));
 
-        return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
-                ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
-                ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
     }
     public static StockInfo scrapeCNN(String stock){
         String webpage = scrape(cnn+stock);
@@ -259,9 +277,7 @@ public class Scraper {
         String weekHigh = webpage.substring(webpage.indexOf("val hi"));
         weekHigh = weekHigh.substring(weekHigh.indexOf(">")+1, weekHigh.indexOf("</div>"));
 
-        StockInfo cnn =  new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
-                ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
-                ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+        StockInfo cnn = replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
 
         search = "companyName";
         String name = webpage.substring(webpage.indexOf(search)+search.length()+2);
@@ -272,7 +288,7 @@ public class Scraper {
     }
 
     public static StockInfo scrapeAll(String stock, String exchange){
-        StockInfo google = scrapeGoogle(stock);
+        StockInfo google = scrapeGoogle(stock, exchange);
         StockInfo msn = scrapeMSN(stock, exchange);
         StockInfo cnn = scrapeCNN(stock);
         StockInfo yahoo = scrapeYahoo(stock);
@@ -294,6 +310,6 @@ public class Scraper {
         return avg;
     }
     public static void main(String[] args){
-        scrapeAll("TSLA","NYS");
+        scrapeAll("AAL","NAS");
     }
 }
