@@ -20,20 +20,18 @@ public class Stock
 	private BigDecimal lastPrice;
 	private BigDecimal priceChange;
 	private BigDecimal percentChange;
-	
-	/*
-	// New attributes
-	private BigDecimal beta;
-	private String sector;
-	
-	// Possible new attributes?
 	private BigDecimal todaysOpen;
 	private BigDecimal todaysHigh;
 	private BigDecimal todaysLow;
 	private BigDecimal fiftyTwoWeekHigh;
 	private BigDecimal fiftyTwoWeekLow;
-	private BigDecimal priceToEarningRatio;
+	private BigDecimal priceEarningRatio;
 	private BigDecimal yield;
+	
+	/*
+	// Possible new attributes?
+	private BigDecimal beta;
+	private String sector;
 	*/
 
 	// Relationships
@@ -89,6 +87,76 @@ public class Stock
 	{
 		this.percentChange = percentChange;
 	}
+	
+	public BigDecimal getTodaysOpen()
+	{
+		return todaysOpen;
+	}
+
+	public void setTodaysOpen(BigDecimal todaysOpen)
+	{
+		this.todaysOpen = todaysOpen;
+	}
+
+	public BigDecimal getTodaysHigh()
+	{
+		return todaysHigh;
+	}
+
+	public void setTodaysHigh(BigDecimal todaysHigh)
+	{
+		this.todaysHigh = todaysHigh;
+	}
+
+	public BigDecimal getTodaysLow()
+	{
+		return todaysLow;
+	}
+
+	public void setTodaysLow(BigDecimal todaysLow)
+	{
+		this.todaysLow = todaysLow;
+	}
+
+	public BigDecimal getFiftyTwoWeekHigh()
+	{
+		return fiftyTwoWeekHigh;
+	}
+
+	public void setFiftyTwoWeekHigh(BigDecimal fiftyTwoWeekHigh)
+	{
+		this.fiftyTwoWeekHigh = fiftyTwoWeekHigh;
+	}
+
+	public BigDecimal getFiftyTwoWeekLow()
+	{
+		return fiftyTwoWeekLow;
+	}
+
+	public void setFiftyTwoWeekLow(BigDecimal fiftyTwoWeekLow)
+	{
+		this.fiftyTwoWeekLow = fiftyTwoWeekLow;
+	}
+
+	public BigDecimal getPriceEarningRatio()
+	{
+		return priceEarningRatio;
+	}
+
+	public void setPriceEarningRatio(BigDecimal priceEarningRatio)
+	{
+		this.priceEarningRatio = priceEarningRatio;
+	}
+
+	public BigDecimal getYield()
+	{
+		return yield;
+	}
+
+	public void setYield(BigDecimal yield)
+	{
+		this.yield = yield;
+	}
 
 	@ManyToMany
 	public Set<Account> getAccounts()
@@ -108,6 +176,13 @@ public class Stock
 		lastPrice = new BigDecimal("0");
 		priceChange = new BigDecimal("0");
 		percentChange = new BigDecimal("0");
+		todaysOpen = new BigDecimal("0");
+		todaysHigh = new BigDecimal("0");
+		todaysLow = new BigDecimal("0");
+		fiftyTwoWeekHigh = new BigDecimal("0");
+		fiftyTwoWeekLow = new BigDecimal("0");
+		priceEarningRatio = new BigDecimal("0");
+		yield = new BigDecimal("0");
 	}
 
 	public Stock(Stock other)
@@ -117,6 +192,13 @@ public class Stock
 		lastPrice = other.getLastPrice();
 		priceChange = other.getPriceChange();
 		percentChange = other.getPercentChange();
+		todaysOpen = other.getTodaysOpen();
+		todaysHigh = other.getTodaysHigh();
+		todaysLow = other.getTodaysLow();
+		fiftyTwoWeekHigh = other.getFiftyTwoWeekHigh();
+		fiftyTwoWeekLow = other.getFiftyTwoWeekLow();
+		priceEarningRatio = other.getPriceEarningRatio();
+		yield = other.getYield();
 	}
 
 }

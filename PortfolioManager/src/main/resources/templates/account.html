@@ -16,7 +16,7 @@
 	
 	<form>
 		<h3>Account Summary:</h3>
-		<!-- Value: <span th:text="${}">Unknown</span><br></br> -->
+		Value: $<span th:text="${account.printValue(accountRepo, stockRepo)}">Unknown</span><br></br>
 		Label: <span th:text="${account.label}">Unknown</span><br></br>
 		Company: <span th:text="${account.accountID.company}">Unknown</span><br></br>
 		Number: <span th:text="${account.accountID.number}">Unknown</span><br></br>
@@ -48,7 +48,7 @@
 		<button>Add New Stock</button>
 	</form><br></br>
 	
-	<form th:action="@{/sessionkey={sessionKey}/userid={userid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="get">
+	<form th:action="@{/sessionkey={sessionKey}/userid={userid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()})}" method="post">
 		<button>Return to User Screen</button>
 	</form>
 </body>

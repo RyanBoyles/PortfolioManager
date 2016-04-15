@@ -31,7 +31,15 @@
 		<button>Delete Stock</button>
 	</form>
 	
-	<h3>Something for similar stocks here?</h3>
+	<h3>Similar Stocks:</h3>
+	<div th:each="similarStock : ${similarStockFinder.getSimilarStocks(stockRepo, stock.stockID.symbol, stock.lastPrice, stock.stockID.exchange)}">
+		Exchange: <span th:text="${similarStock.stockID.exchange}">Unknown</span><br></br>
+		Symbol: <span th:text="${similarStock.stockID.symbol}">Unknown</span><br></br>
+		Name: <span th:text="${similarStock.name}">Not Yet Populated</span><br></br>
+		Last Price: <span th:text="${similarStock.lastPrice}">Not Yet Populated</span><br></br>
+		Price Change: <span th:text="${similarStock.priceChange}">Not Yet Populated</span><br></br>
+		Percent Change: <span th:text="${similarStock.percentChange}">Not Yet Populated</span><br></br><br></br>
+	</div>
 	
 	<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${account.accountID.hashCode()})}" method="get">
 		<button>Return to Account Screen</button>

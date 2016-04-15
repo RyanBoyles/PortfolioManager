@@ -1,7 +1,9 @@
 
 package com.portfoliomanager.web;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,9 @@ import com.portfoliomanager.domain.User;
 import com.portfoliomanager.internals.Login;
 import com.portfoliomanager.internals.NewUser;
 import com.portfoliomanager.internals.NumberOfShares;
+import com.portfoliomanager.internals.Scraper;
+import com.portfoliomanager.internals.SimilarStockFinder;
+import com.portfoliomanager.internals.StockInfo;
 import com.portfoliomanager.repository.AccountRepository;
 import com.portfoliomanager.repository.StockRepository;
 import com.portfoliomanager.repository.UserRepository;
@@ -36,6 +41,8 @@ public class IndexController
 
 	@Autowired
 	private StockRepository stockRepo;
+	
+	private Date lastUpdateTime;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String homeGet(ModelMap model)
@@ -158,8 +165,35 @@ public class IndexController
 		User user = userRepo.findUserByEmail( validLogin.getEmail() ).get(0);
 		model.put("user", user);
 		
-		// TODO: NOT YET REQUIRED: ITERATE THROUGH THE ACCOUNTS OWNED BY THIS USER AND THE STOCKS WITHIN THOSE ACCOUNTS AND POPULATE THE STOCK DATA FOR THIS USER. NOTE THE CRAWLER NEEDS TO AVERAGE (OR GET THE MOST RECENT) INFO FROM MULTIPLE SITES TO COUNT AS AN ADVANCED FUNCTION.
+		Date currentTime = new Date();
+		long minutesSinceLastUpdate = 31L; // If there is an error with finding the time since the last update, we want to make sure if updates. (i.e. time since update > 30)
 		
+		if (lastUpdateTime != null)
+		{
+			minutesSinceLastUpdate = TimeUnit.MINUTES.convert(currentTime.getTime() - lastUpdateTime.getTime(), TimeUnit.MILLISECONDS);
+		}
+		
+		if ((lastUpdateTime == null) || (minutesSinceLastUpdate > 30))
+		{
+			List<Stock> allStocks = stockRepo.findAll();
+			for (Stock stock : allStocks)
+			{	
+				StockInfo info = Scraper.scrapeAll(stock.getStockID().getSymbol(), stock.getStockID().getExchange());
+			
+				stockRepo.updateStock(stock.getStockID().getSymbol(), stock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield);
+			
+				/*
+				System.out.println("Symbol = " + stock.getStockID().getSymbol());
+				System.out.println("Exchange = " + stock.getStockID().getExchange());
+				System.out.println("Price = " + info.price);
+				System.out.println("PriceChange = " + info.priceChange);
+				System.out.println("PercentChange = " + info.perChange);
+				System.out.println();
+			 	*/
+			}
+			
+			lastUpdateTime = new Date();
+		}
 		
 		return "user";
 	}
@@ -249,7 +283,7 @@ public class IndexController
 		{
 			accountRepo.removeAllStocksHeldInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber());
 		}
-		stockRepo.removeStocksHeldInNoAccounts();
+		//stockRepo.removeStocksHeldInNoAccounts();
 		accountRepo.removeAccountsOwnedByUser(user.getUserID().getEmail());
 		userRepo.removeUser(user.getUserID().getEmail());
 
@@ -415,11 +449,12 @@ public class IndexController
 			if (duplicateStockInStockTable.isEmpty())
 			{
 				stockRepo.addStock(newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
+				
+				StockInfo info = Scraper.scrapeAll(newStock.getStockID().getSymbol(), newStock.getStockID().getExchange());
+				
+				stockRepo.updateStock(newStock.getStockID().getSymbol(), newStock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield);
 			}
 			accountRepo.addStockToAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
-		
-			// TODO: NOT YET REQUIRED: UPDATE THIS STOCKS REAL TIME INFORMATION (FIRST CHECK IF THE STOCK RESIDES IN ANY OTHER ACCOUNTS OWNED BY THE USER. IF IT DOES, JUST TAKE THAT INFORMATION)
-		
 		}
 
 		return "account";
@@ -442,6 +477,9 @@ public class IndexController
 				break;
 			}
 		}
+		
+		SimilarStockFinder similarStockFinder = new SimilarStockFinder();
+		model.put("similarStockFinder", similarStockFinder);
 		
 		return "stock";
 	}
@@ -522,7 +560,7 @@ public class IndexController
 		}
 		
 		accountRepo.removeStockHeldInAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), stock.getStockID().getExchange(), stock.getStockID().getSymbol());
-		stockRepo.removeStocksHeldInNoAccounts();
+		//stockRepo.removeStocksHeldInNoAccounts();
 		
 		return "redirect:/sessionkey=" + sessionKey + "/userid=" + userIDHash + "/accountid=" + accountIDHash;
 	}

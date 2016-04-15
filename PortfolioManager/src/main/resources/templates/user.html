@@ -33,6 +33,7 @@
 	</div>
 	<div th:each="acnt : ${accountRepo.findAccountsByUser(user.userID.email)}"> <!-- SEE IF THIS WORKS AND GETS RID OF AUTO-GENERATED SQL -->
 		<form th:action="@{/sessionkey={sessionKey}/userid={userid}/accountid={accountid}(sessionKey=${sessionKey}, userid=${user.userID.hashCode()}, accountid=${acnt.accountID.hashCode()})}" method="get">
+			Value: $<span th:text="${acnt.printValue(accountRepo, stockRepo)}">Unknown</span><br></br>
 			Label: <span th:text="${acnt.label}"></span><br></br>
 			Company: <span th:text="${acnt.accountID.company}"></span><br></br>
 			Number: <span th:text="${acnt.accountID.number}"></span><br></br>
