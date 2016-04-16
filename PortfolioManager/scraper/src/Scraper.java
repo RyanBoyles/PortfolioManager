@@ -220,7 +220,7 @@ public class Scraper {
 
         String pe = section.substring(section.indexOf("P/E"));
         pe = pe.substring(pe.indexOf("truncated-string"));
-        pe = pe.substring(pe.indexOf(">")+1);
+        pe = pe.substring(pe.indexOf(">")+1, pe.indexOf("</p>"));
         if(pe.indexOf("-") != -1)
             pe = "0";
         else
@@ -272,11 +272,9 @@ public class Scraper {
             yield = yield.substring(0,yield.indexOf("%"));
 
         String pe = section.substring(section.indexOf("P/E ratio"));
-        pe = pe.substring(pe.indexOf("Point\">")+7);
+        pe = pe.substring(pe.indexOf("Point\">")+7,pe.indexOf("</td>"));
         if(pe.indexOf("NM") != -1)
             pe = "0";
-        else
-            pe = pe.substring(0,pe.indexOf("</td>"));
 
         String weekLow = webpage.substring(webpage.indexOf("val lo"));
         weekLow = weekLow.substring(weekLow.indexOf(">")+1, weekLow.indexOf("</div>"));
@@ -318,6 +316,6 @@ public class Scraper {
         return avg;
     }
     public static void main(String[] args){
-        scrapeYahoo("F");
+        scrapeMSN("CAT","NYS");
     }
 }
