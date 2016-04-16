@@ -272,9 +272,11 @@ public class Scraper {
             yield = yield.substring(0,yield.indexOf("%"));
 
         String pe = section.substring(section.indexOf("P/E ratio"));
-        pe = pe.substring(pe.indexOf("Point\">")+7,pe.indexOf("</td>"));
+        pe = pe.substring(pe.indexOf("Point\">")+7);
         if(pe.indexOf("NM") != -1)
             pe = "0";
+        else
+            pe = pe.substring(0,pe.indexOf("</td>"));
 
         String weekLow = webpage.substring(webpage.indexOf("val lo"));
         weekLow = weekLow.substring(weekLow.indexOf(">")+1, weekLow.indexOf("</div>"));
