@@ -13,17 +13,12 @@ public class StockInfo {
     double weekLow;
     double pe;
     double yield;
+    double beta;
 
 
     public StockInfo(){
-        price = perChange = priceChange = open = todayHigh = todayLow = weekLow = weekHigh = pe = yield = 0;
+        price = perChange = priceChange = open = todayHigh = todayLow = weekLow = weekHigh = pe = yield = beta = 0;
         name = "";
-    }
-
-    public StockInfo(double price, double priceChange, double perChange){
-        this.price = price;
-        this.priceChange = priceChange;
-        this.perChange = perChange;
     }
 
     public StockInfo(double price, double priceChange, double perChange, double open, double todayHigh,
@@ -39,6 +34,7 @@ public class StockInfo {
         this.pe = pe;
         this.yield = yield;
         this.name = "";
+        this.beta = 0;
     }
 }
 
