@@ -321,7 +321,7 @@ public class Scraper {
 
         return avg;
     }
-    public static void main(String[] args){
-        scrapeYahoo("PAGP");
-    }
+    //public static void main(String[] args){
+    //    scrapeYahoo("PAGP");
+    //}
 }
