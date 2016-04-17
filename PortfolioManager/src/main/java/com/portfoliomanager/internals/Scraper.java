@@ -46,7 +46,7 @@ public class Scraper {
     }
 
     public static StockInfo replaceComma(String price, String priceChange, String perChange, String open, String todayHigh,
-                                    String todayLow, String weekHigh, String weekLow, String pe, String yield){
+                                    String todayLow, String weekHigh, String weekLow, String pe, String yield, String beta){
 
         price = price.replaceAll(",","");
         priceChange = priceChange.replaceAll(",","");
@@ -58,10 +58,14 @@ public class Scraper {
         weekLow = weekLow.replaceAll(",","");
         pe = pe.replaceAll(",","");
         yield = yield.replaceAll(",","");
+        beta = beta.replaceAll(",","");
 
-        return new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
+        StockInfo stock = new StockInfo(Double.parseDouble(price), Double.parseDouble(priceChange),Double.parseDouble(perChange)
                 ,Double.parseDouble(open),Double.parseDouble(todayHigh),Double.parseDouble(todayLow),Double.parseDouble(weekHigh)
                 ,Double.parseDouble(weekLow),Double.parseDouble(pe),Double.parseDouble(yield));
+        stock.beta = Double.parseDouble(beta);
+
+        return stock;
     }
 
     public static StockInfo scrapeYahoo(String stock){
@@ -116,7 +120,12 @@ public class Scraper {
         else
             yield = yield.substring(0,yield.indexOf("%"));
 
-        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
+        String beta = webpage.substring(webpage.indexOf("Beta"));
+        beta = beta.substring(beta.indexOf("data1\">")+7,beta.indexOf("</td>"));
+        if(beta.equals("N/A"))
+            beta = "-1";
+
+        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield,beta);
     }
     public static StockInfo scrapeGoogle(String stock, String exchange){
         if(exchange.equals("NAS"))
@@ -168,7 +177,7 @@ public class Scraper {
         else
             yield = yield.substring(yield.indexOf("/")+1);
 
-        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
+        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield,"0");
     }
     public static StockInfo scrapeMSN(String stock, String exchange){
         String webpage = scrape(msn+stock+"."+exchange);
@@ -215,13 +224,13 @@ public class Scraper {
 
         String pe = section.substring(section.indexOf("P/E"));
         pe = pe.substring(pe.indexOf("truncated-string"));
-        pe = pe.substring(pe.indexOf(">")+1);
+        pe = pe.substring(pe.indexOf(">")+1, pe.indexOf("</p>"));
         if(pe.indexOf("-") != -1)
             pe = "0";
         else
             pe = pe.substring(0, pe.indexOf(" ("));
 
-        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
+        return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield,"0");
     }
     public static StockInfo scrapeCNN(String stock){
         String webpage = scrape(cnn+stock+"&exHours=off");
@@ -279,7 +288,7 @@ public class Scraper {
         String weekHigh = webpage.substring(webpage.indexOf("val hi"));
         weekHigh = weekHigh.substring(weekHigh.indexOf(">")+1, weekHigh.indexOf("</div>"));
 
-        StockInfo cnn = replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield);
+        StockInfo cnn = replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield,"0");
 
         search = "companyName";
         String name = webpage.substring(webpage.indexOf(search)+search.length()+2);
@@ -308,10 +317,11 @@ public class Scraper {
         avg.pe = (google.pe + msn.pe + cnn.pe + yahoo.pe) / 4;
         avg.yield = (google.yield + msn.yield + cnn.yield + yahoo.yield) / 4;
         avg.name = cnn.name;
+        avg.beta = yahoo.beta;
 
         return avg;
     }
-    //public static void main(String[] args){
-    //    scrapeAll("AAL","NAS");
-    //}
+    public static void main(String[] args){
+        scrapeYahoo("PAGP");
+    }
 }

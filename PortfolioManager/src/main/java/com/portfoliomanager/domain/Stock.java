@@ -27,10 +27,10 @@ public class Stock
 	private BigDecimal fiftyTwoWeekLow;
 	private BigDecimal priceEarningRatio;
 	private BigDecimal yield;
+	private BigDecimal beta;
 	
 	/*
 	// Possible new attributes?
-	private BigDecimal beta;
 	private String sector;
 	*/
 
@@ -158,6 +158,16 @@ public class Stock
 		this.yield = yield;
 	}
 
+	public BigDecimal getBeta()
+	{
+		return beta;
+	}
+
+	public void setBeta(BigDecimal beta)
+	{
+		this.beta = beta;
+	}
+
 	@ManyToMany
 	public Set<Account> getAccounts()
 	{
@@ -183,6 +193,7 @@ public class Stock
 		fiftyTwoWeekLow = new BigDecimal("0");
 		priceEarningRatio = new BigDecimal("0");
 		yield = new BigDecimal("0");
+		beta = new BigDecimal("0");
 	}
 
 	public Stock(Stock other)
@@ -199,6 +210,7 @@ public class Stock
 		fiftyTwoWeekLow = other.getFiftyTwoWeekLow();
 		priceEarningRatio = other.getPriceEarningRatio();
 		yield = other.getYield();
+		beta = other.getBeta();
 	}
 
 }

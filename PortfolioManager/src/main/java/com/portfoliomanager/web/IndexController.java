@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.SwingWorker;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -43,6 +45,8 @@ public class IndexController
 	private StockRepository stockRepo;
 	
 	private Date lastUpdateTime;
+	
+	private int stockUpdateCount;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String homeGet(ModelMap model)
@@ -166,30 +170,51 @@ public class IndexController
 		model.put("user", user);
 		
 		Date currentTime = new Date();
-		long minutesSinceLastUpdate = 31L; // If there is an error with finding the time since the last update, we want to make sure if updates. (i.e. time since update > 30)
+		long minutesSinceLastUpdate = 11L; // If there is an error with finding the time since the last update, we want to make sure if updates. (i.e. time since update > 30)
 		
 		if (lastUpdateTime != null)
 		{
 			minutesSinceLastUpdate = TimeUnit.MINUTES.convert(currentTime.getTime() - lastUpdateTime.getTime(), TimeUnit.MILLISECONDS);
 		}
 		
-		if ((lastUpdateTime == null) || (minutesSinceLastUpdate > 30))
+		if ((lastUpdateTime == null) || (minutesSinceLastUpdate > 10))
 		{
 			List<Stock> allStocks = stockRepo.findAll();
+			int numberOfStocks = allStocks.size();
+			stockUpdateCount = 0;
 			for (Stock stock : allStocks)
-			{	
-				StockInfo info = Scraper.scrapeAll(stock.getStockID().getSymbol(), stock.getStockID().getExchange());
+			{
+				SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>()
+				{
+					protected Object doInBackground()
+					{	
+						StockInfo info = Scraper.scrapeAll(stock.getStockID().getSymbol(), stock.getStockID().getExchange());
 			
-				stockRepo.updateStock(stock.getStockID().getSymbol(), stock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield);
+						stockRepo.updateStock(stock.getStockID().getSymbol(), stock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield, info.beta);
+						
+						return null;
+					}
+
+					protected synchronized void done()
+					{
+						stockUpdateCount++;
+					}
+				};
+
+				worker.execute();
+			}
 			
-				/*
-				System.out.println("Symbol = " + stock.getStockID().getSymbol());
-				System.out.println("Exchange = " + stock.getStockID().getExchange());
-				System.out.println("Price = " + info.price);
-				System.out.println("PriceChange = " + info.priceChange);
-				System.out.println("PercentChange = " + info.perChange);
-				System.out.println();
-			 	*/
+			while (stockUpdateCount < numberOfStocks)
+			{
+				try
+				{
+					Thread.sleep(1000);
+					System.out.println("Stocks Updated: " + stockUpdateCount + " / " + numberOfStocks);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			lastUpdateTime = new Date();
@@ -452,7 +477,7 @@ public class IndexController
 				
 				StockInfo info = Scraper.scrapeAll(newStock.getStockID().getSymbol(), newStock.getStockID().getExchange());
 				
-				stockRepo.updateStock(newStock.getStockID().getSymbol(), newStock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield);
+				stockRepo.updateStock(newStock.getStockID().getSymbol(), newStock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield, info.beta);
 			}
 			accountRepo.addStockToAccount(account.getAccountID().getCompany(), account.getAccountID().getNumber(), newStock.getStockID().getExchange(), newStock.getStockID().getSymbol());
 		}
