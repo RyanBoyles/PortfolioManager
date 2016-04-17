@@ -120,6 +120,8 @@ public class Scraper {
 
         String beta = webpage.substring(webpage.indexOf("Beta"));
         beta = beta.substring(beta.indexOf("data1\">")+7,beta.indexOf("</td>"));
+        if(beta.equals("N/A"))
+            beta = "-1";
 
         return replaceComma(price,priceChange,perChange,open,todayHigh,todayLow,weekHigh,weekLow,pe,yield,beta);
     }
@@ -318,6 +320,6 @@ public class Scraper {
         return avg;
     }
     public static void main(String[] args){
-        scrapeMSN("CAT","NYS");
+        scrapeYahoo("PAGP");
     }
 }
