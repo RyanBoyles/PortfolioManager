@@ -40,7 +40,7 @@
 	</form>
 	
 	<h3>Similar Stocks:</h3>
-	<div th:each="similarStock : ${similarStockFinder.getSimilarStocks(stockRepo, stock.stockID.symbol, stock.lastPrice, stock.stockID.exchange)}">
+	<div th:each="similarStock : ${similarStockFinder.getSimilarStocks(stockRepo, stock.stockID.symbol, stock.beta, stock.stockID.exchange)}">
 		Exchange: <span th:text="${similarStock.stockID.exchange}">Unknown</span><br></br>
 		Symbol: <span th:text="${similarStock.stockID.symbol}">Unknown</span><br></br>
 		Name: <span th:text="${similarStock.name}">Not Yet Populated</span><br></br>

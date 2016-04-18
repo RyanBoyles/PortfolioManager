@@ -170,24 +170,24 @@ public class IndexController
 		model.put("user", user);
 		
 		Date currentTime = new Date();
-		long minutesSinceLastUpdate = 11L; // If there is an error with finding the time since the last update, we want to make sure if updates. (i.e. time since update > 30)
+		long minutesSinceLastUpdate = 31L; // If there is an error with finding the time since the last update, we want to make sure if updates. (i.e. time since update > 30)
 		
 		if (lastUpdateTime != null)
 		{
 			minutesSinceLastUpdate = TimeUnit.MINUTES.convert(currentTime.getTime() - lastUpdateTime.getTime(), TimeUnit.MILLISECONDS);
 		}
 		
-		if ((lastUpdateTime == null) || (minutesSinceLastUpdate > 10))
+		if ((lastUpdateTime == null) || (minutesSinceLastUpdate > 30))
 		{
 			List<Stock> allStocks = stockRepo.findAll();
 			int numberOfStocks = allStocks.size();
 			stockUpdateCount = 0;
 			for (Stock stock : allStocks)
-			{
+			{	
 				SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>()
-				{
+				{	
 					protected Object doInBackground()
-					{	
+					{
 						StockInfo info = Scraper.scrapeAll(stock.getStockID().getSymbol(), stock.getStockID().getExchange());
 			
 						stockRepo.updateStock(stock.getStockID().getSymbol(), stock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield, info.beta);

@@ -29,7 +29,7 @@ public class SimilarStockFinder
         double old_price = 0;
         boolean p_flag = false;
         boolean rest_flag = false;
-        
+        boolean vol = true;
         //parse volume data
         while ((line = br.readLine()) != null) {
         	if(line.contains("The closing daily official volumes"))
@@ -56,12 +56,24 @@ public class SimilarStockFinder
         			//System.out.println(line);
         			String digits = line.replaceAll("[^0-9.]", "");
         			//System.out.println(digits);
-        			week_volume += Long.parseLong(digits);
+        			if(digits.isEmpty())
+        			{
+        				vol = false;
+        				break;
+        			}
+        			else
+        				week_volume += Long.parseLong(digits);
         		}
         		else if(count == 291)
         		{
         			String digits = line.replaceAll("[^0-9.]", "");
-        			old_price = Double.parseDouble(digits);
+        			if(digits.isEmpty())
+        			{
+        				vol = false;
+        				break;
+        			}
+        			else
+        				old_price = Double.parseDouble(digits);
         			
         		}
         		else if(count == 295)
@@ -82,6 +94,7 @@ public class SimilarStockFinder
         count = 0;
         boolean dividends = false;
         int d_c = 0;
+        boolean one_exist = true;
         while ((line = br1.readLine()) != null) {
         	//gets avg volume
             if(line.contains("This is the average share volume for the past 50 trading days"))
@@ -94,9 +107,17 @@ public class SimilarStockFinder
             	if(count == 7)
                 {
             		String num = line.replaceAll("[^0-9.]", "");
-            		avg_volume = Long.parseLong(num);
-            		//System.out.println("Avg volume per day: "+ avg_volume);
-            		avg_flag = false;
+            		if(num.isEmpty())
+            		{
+            			vol = false;
+            			avg_flag = false;
+            		}
+            		else
+            		{
+            			avg_volume = Long.parseLong(num);									// PARSING ERROR HERE FOR CSCO
+            			//System.out.println("Avg volume per day: "+ avg_volume);
+            			avg_flag = false;
+            		}
                 }
             }
             
@@ -110,8 +131,15 @@ public class SimilarStockFinder
             	if(y_c == 1)
             	{
             		String num = line.replaceAll("[^0-9.]", "");
-            		one_year = Double.parseDouble(num);
-            		//System.out.println("1 year target: "+ one_year);
+            		if(num.isEmpty())
+            		{
+            			one_exist = false;
+            		}
+            		else
+            		{
+            			one_year = Double.parseDouble(num);
+            			//System.out.println("1 year target: "+ one_year);
+            		}
             		one_flag = false;
             	}
             	y_c++;
@@ -125,6 +153,11 @@ public class SimilarStockFinder
             	if(d_c == 6)
             	{
             		String num = line.replaceAll("[^0-9.]", "");
+            		if(num.isEmpty())
+            		{
+            			dividends = false;
+            			break;
+            		}
             		double div = Double.parseDouble(num);
             		if(div <= 0)
             			dividends = false;
@@ -136,94 +169,107 @@ public class SimilarStockFinder
         double sum = 0;
         
         //1 year target rated 1-5
-        double off_target = ((double) one_year / price) -1;
-        if(off_target > 0)
+        if(one_exist)
         {
-        	if(off_target > .3)
-        		sum += 5;
-        	else if(off_target > .2)
-        		sum += 4.5;
-        	else if(off_target > .1)
-        		sum += 4;
+        	double off_target = ((double) one_year / price) -1;
+        	if(off_target > 0)
+        	{
+        		if(off_target > .3)
+        			sum += 5;
+        		else if(off_target > .2)
+        			sum += 4.5;
+        		else if(off_target > .1)
+        			sum += 4;
+        		else
+        			sum += 3.5;
+        	}
         	else
-        		sum += 3.5;
+        	{
+        		if(off_target > -.05)
+        			sum += 3;
+        		else if(off_target > -.1)
+        			sum += 2;
+        		else if(off_target > -.15)
+        			sum += 1;
+        	}
         }
         else
         {
-        	if(off_target > -.05)
-        		sum += 3;
-        	else if(off_target > -.1)
-        		sum += 2;
-        	else if(off_target > -.15)
-        		sum += 1;
+        	sum += 2.5;
         }
         
         //volume rated 1-5
-        double percent_change = ((price - old_price) / old_price) * 100;
-        double vol_percentage = (((double) week_volume / (avg_volume * 14) ) - 1) * 100;
-        //System.out.println(percent_change);
-        //System.out.println(vol_percentage);
-        if(percent_change > 0)
+        if(vol)
         {
-        	if(vol_percentage < 0)
+        	double percent_change = ((price - old_price) / old_price) * 100;
+        	double vol_percentage = (((double) week_volume / (avg_volume * 14) ) - 1) * 100;
+        	//System.out.println(percent_change);
+        	//System.out.println(vol_percentage);
+        	if(percent_change > 0)
         	{
-        		if(vol_percentage > -10)
-        			sum += 3;
-        		else if(vol_percentage > -15)
-        			sum += 2.5;
-        		else if(vol_percentage > -20)
-        			sum += 2;
+        		if(vol_percentage < 0)
+        		{
+        			if(vol_percentage > -10)
+        				sum += 3;
+        			else if(vol_percentage > -15)
+        				sum += 2.5;
+        			else if(vol_percentage > -20)
+        				sum += 2;
+        			else
+        				sum += 1;
+        		}
         		else
-        			sum += 1;
+        		{
+        			if(vol_percentage < 5)
+        				sum += 3.5;
+        			else if(vol_percentage < 10)
+        				sum += 4;
+        			else if(vol_percentage < 15)
+        				sum += 4.5;
+        			else
+        				sum += 5;
+        		}	
         	}
         	else
         	{
-        		if(vol_percentage < 5)
-        			sum += 3.5;
-        		else if(vol_percentage < 10)
-        			sum += 4;
-        		else if(vol_percentage < 15)
-        			sum += 4.5;
+        		if(vol_percentage > 0)
+        		{
+        			if(vol_percentage < 2.5)
+        				sum += 3;
+        			else if(vol_percentage < 5)
+        				sum += 2.5;
+        			else if(vol_percentage < 7.5)
+        				sum += 2;
+        			else if(vol_percentage < 10)
+        				sum += 1;
+        		}
         		else
-        			sum += 5;
+        		{
+        			if(vol_percentage > -5)
+        				sum += 3.5;
+        			else if(vol_percentage > -7.5)
+        				sum += 4;
+        			else if(vol_percentage > -10)
+        				sum += 4.5;
+        			else
+        				sum += 5;
+        		}
         	}
         }
         else
         {
-        	if(vol_percentage > 0)
-        	{
-        		if(vol_percentage < 2.5)
-        			sum += 3;
-        		else if(vol_percentage < 5)
-        			sum += 2.5;
-        		else if(vol_percentage < 7.5)
-        			sum += 2;
-        		else if(vol_percentage < 10)
-        			sum += 1;
-        	}
-        	else
-        	{
-        		if(vol_percentage > -5)
-        			sum += 3.5;
-        		else if(vol_percentage > -7.5)
-        			sum += 4;
-        		else if(vol_percentage > -10)
-        			sum += 4.5;
-        		else
-        			sum += 5;
-        	}
+        	sum += 2.5;
         }
-        
         if(dividends)
         	sum += .5;
         return sum;
 	}
 	
-	public static Stock[] getSimilarStocks(StockRepository stockRepo, String symbol, double price, String exchange) throws NumberFormatException, IOException
+	public static Stock[] getSimilarStocks(StockRepository stockRepo, String symbol, double beta, String exchange) throws NumberFormatException, IOException
 	{
-		double p_low = price *.75;
-		double p_high = price *1.25;
-		List<Stock> similar = stockRepo.findSimilar(exchange, symbol, p_low, p_high);
+		double b_low = beta * .85;
+		double b_high = beta * 1.15;
+		List<Stock> similar = stockRepo.findSimilar(exchange, symbol, b_low, b_high);
 		if(similar.isEmpty())
 		{
 			return new Stock[0];
