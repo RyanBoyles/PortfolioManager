@@ -46,7 +46,9 @@ public class IndexController
 	
 	private Date lastUpdateTime;
 	
-	private int stockUpdateCount;
+	//private int stockUpdateCount;
+	
+	//private final static Object lockObject = new Object();
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String homeGet(ModelMap model)
@@ -170,7 +172,7 @@ public class IndexController
 		model.put("user", user);
 		
 		Date currentTime = new Date();
-		long minutesSinceLastUpdate = 31L; // If there is an error with finding the time since the last update, we want to make sure if updates. (i.e. time since update > 30)
+		long minutesSinceLastUpdate = 31L; // If there is an error with finding the time since the last update, we want to make sure it updates. (i.e. time since update > 30)
 		
 		if (lastUpdateTime != null)
 		{
@@ -179,49 +181,90 @@ public class IndexController
 		
 		if ((lastUpdateTime == null) || (minutesSinceLastUpdate > 30))
 		{
-			List<Stock> allStocks = stockRepo.findAll();
-			int numberOfStocks = allStocks.size();
-			stockUpdateCount = 0;
-			for (Stock stock : allStocks)
+			//List<Stock> allStocks = stockRepo.findAll();
+			//int numberOfStocks = allStocks.size();
+			//stockUpdateCount = 0;
+			
+			SwingWorker<Object, Void> updateAllStocksWorker = new SwingWorker<Object, Void>()
 			{	
-				SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>()
-				{	
-					protected Object doInBackground()
-					{
-						StockInfo info = Scraper.scrapeAll(stock.getStockID().getSymbol(), stock.getStockID().getExchange());
+				protected Object doInBackground()
+				{
+					List<Stock> allStocks = stockRepo.findAll();
+					
+					for (Stock stock : allStocks)
+					{	
+						SwingWorker<Object, Void> worker = new SwingWorker<Object, Void>()
+						{	
+							protected Object doInBackground()
+							{
+								StockInfo info = Scraper.scrapeAll(stock.getStockID().getSymbol(), stock.getStockID().getExchange());
 			
-						stockRepo.updateStock(stock.getStockID().getSymbol(), stock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield, info.beta);
+								stockRepo.updateStock(stock.getStockID().getSymbol(), stock.getStockID().getExchange(), info.name, info.price, info.priceChange, info.perChange, info.open, info.todayHigh, info.todayLow, info.weekHigh, info.weekLow, info.pe, info.yield, info.beta);
 						
-						return null;
-					}
+								return null;
+							}
 
-					protected synchronized void done()
+							protected void done()
+							{
+								/*
+								synchronized(lockObject)
+								{
+									stockUpdateCount++;
+								}
+								*/
+							}
+						};
+
+						worker.execute();
+					}
+					
+					return null;
+				}
+				
+				protected void done()
+				{
+					/*
+					while (!stocksDoneUpdating(numberOfStocks))
 					{
-						stockUpdateCount++;
+						try
+						{
+							Thread.sleep(1000);
+						}
+						catch (InterruptedException e)
+						{
+							e.printStackTrace();
+						}
 					}
-				};
+					
+					lastUpdateTime = new Date();
+					*/
+				}
+			};
 
-				worker.execute();
-			}
-			
-			while (stockUpdateCount < numberOfStocks)
-			{
-				try
-				{
-					Thread.sleep(1000);
-					System.out.println("Stocks Updated: " + stockUpdateCount + " / " + numberOfStocks);
-				}
-				catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
+			updateAllStocksWorker.execute();
 			
 			lastUpdateTime = new Date();
 		}
 		
 		return "user";
 	}
+	
+	/*
+	private boolean stocksDoneUpdating(int numberOfStocksToBeUpdated)
+	{
+		synchronized(lockObject)
+		{
+			if (stockUpdateCount < numberOfStocksToBeUpdated)
+			{
+				System.out.println("Stocks Updated: " + stockUpdateCount + " / " + numberOfStocksToBeUpdated);
+				
+				return false;
+			}
+			
+			return true;
+		}
+	}
+	*/
 	
 	@RequestMapping(value = "/sessionkey={sessionKey}/userid={userIDHash}", method = RequestMethod.POST)
 	public String userPost(@PathVariable String sessionKey, @PathVariable int userIDHash, @ModelAttribute("login") Login validLogin, ModelMap model)

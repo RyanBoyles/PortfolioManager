@@ -267,49 +267,58 @@ public class SimilarStockFinder
 	
 	public static Stock[] getSimilarStocks(StockRepository stockRepo, String symbol, double beta, String exchange) throws NumberFormatException, IOException
 	{
-		double b_low = beta * .85;
-		double b_high = beta * 1.15;
-		List<Stock> similar = stockRepo.findSimilar(exchange, symbol, b_low, b_high);
-		if(similar.isEmpty())
+		try
 		{
-			return new Stock[0];
-		}
-		
-		Stock[] topFour = new Stock[4];
-		double[] ranks = new double[4];
-		ranks[0] = 0; ranks[1] = 0; ranks[2] = 0; ranks[3] = 0;
-		int count = 0;
-		for(Stock stock : similar)
-		{
-			StockID s_id = stock.getStockID();
-			double rank = getRank(s_id.getSymbol(), Double.valueOf(stock.getLastPrice().toString()));
-			for(int i = 0; i < 4; i++)
+			double b_low = beta * .85;
+			double b_high = beta * 1.15;
+			List<Stock> similar = stockRepo.findSimilar(exchange, symbol, b_low, b_high);
+			if(similar.isEmpty())
 			{
-				if(ranks[i] < rank)
+				return new Stock[0];
+			}
+		
+			Stock[] topFour = new Stock[4];
+			double[] ranks = new double[4];
+			ranks[0] = 0; ranks[1] = 0; ranks[2] = 0; ranks[3] = 0;
+			int count = 0;
+			for(Stock stock : similar)
+			{
+				StockID s_id = stock.getStockID();
+				double rank = getRank(s_id.getSymbol(), Double.valueOf(stock.getLastPrice().toString()));
+				for(int i = 0; i < 4; i++)
 				{
-					if(count < 4)
-						count++;
-					//shift over so it stays in order
-					for(int j = 3; j >= i; j--)
+					if(ranks[i] < rank)
 					{
-						if(j != 3)
+						if(count < 4)
+							count++;
+						//shift over so it stays in order
+						for(int j = 3; j >= i; j--)
 						{
-							ranks[j+1] = ranks[j];
-							topFour[j+1] = topFour[j];
+							if(j != 3)
+							{
+								ranks[j+1] = ranks[j];
+								topFour[j+1] = topFour[j];
+							}
 						}
+						ranks[i] = rank;
+						topFour[i] = stock;
+						break;
 					}
-					ranks[i] = rank;
-					topFour[i] = stock;
-					break;
 				}
 			}
+			Stock[] returnVal = new Stock[count];
+			for(int i = 0; i < count; i++)
+			{
+				returnVal[i] = topFour[i];
+			}
+			return returnVal;
 		}
-		Stock[] returnVal = new Stock[count];
-		for(int i = 0; i < count; i++)
+		catch (Exception e)
 		{
-			returnVal[i] = topFour[i];
+			e.printStackTrace();
+			
+			return new Stock[0];
 		}
-		return returnVal;
 	}
 	
 }
