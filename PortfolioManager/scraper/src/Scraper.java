@@ -15,6 +15,9 @@ public class Scraper {
     static String msn = "http://www.msn.com/en-us/money/stockdetails/fi-126.1.";  // Add (symbol).(exchange)
     static String cnn = "http://money.cnn.com/quote/quote.html?symb=";  //Add symbol
 
+
+    // Scrape function taken from
+    // http://stackoverflow.com/questions/238547/how-do-you-programmatically-download-a-webpage-in-java
     public static String scrape(String urlString){
         URL url;
         InputStream is = null;
